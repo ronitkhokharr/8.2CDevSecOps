@@ -18,17 +18,10 @@ pipeline {
             }
             post {
                 always {
-                    emailext(
+                    mail(
                         to: 'ronitkhokharr@gmail.com',
                         subject: "Run Tests Stage - ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            <p>Build Status: <b>${currentBuild.currentResult}</b></p>
-                            <p>Job: ${env.JOB_NAME}</p>
-                            <p>Build Number: ${env.BUILD_NUMBER}</p>
-                            <p>Check console output at: <a href='${env.BUILD_URL}'>${env.BUILD_URL}</a></p>
-                        """,
-                        mimeType: 'text/html',
-                        attachLog: true
+                        body: "Build Status: ${currentBuild.currentResult}\nJob: ${env.JOB_NAME}\nBuild Number: ${env.BUILD_NUMBER}\nCheck console output at: ${env.BUILD_URL}"
                     )
                 }
             }
@@ -44,17 +37,10 @@ pipeline {
             }
             post {
                 always {
-                    emailext(
+                    mail(
                         to: 'ronitkhokharr@gmail.com',
                         subject: "Security Scan Stage - ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            <p>Build Status: <b>${currentBuild.currentResult}</b></p>
-                            <p>Job: ${env.JOB_NAME}</p>
-                            <p>Build Number: ${env.BUILD_NUMBER}</p>
-                            <p>Check console output at: <a href='${env.BUILD_URL}'>${env.BUILD_URL}</a></p>
-                        """,
-                        mimeType: 'text/html',
-                        attachLog: true
+                        body: "Build Status: ${currentBuild.currentResult}\nJob: ${env.JOB_NAME}\nBuild Number: ${env.BUILD_NUMBER}\nCheck console output at: ${env.BUILD_URL}"
                     )
                 }
             }
