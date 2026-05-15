@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        SONAR_TOKEN = credentials('SONAR_TOKEN')
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -16,22 +20,6 @@ pipeline {
             steps {
                 bat 'npm test || exit /b 0'
             }
-            post {
-                always {
-                    emailext(
-                        to: 'ronitkhokharr@gmail.com',
-                        subject: "Run Tests Stage - ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            <p>Build Status: <b>${currentBuild.currentResult}</b></p>
-                            <p>Job: ${env.JOB_NAME}</p>
-                            <p>Build Number: ${env.BUILD_NUMBER}</p>
-                            <p>Check console output at: <a href='${env.BUILD_URL}'>${env.BUILD_URL}</a></p>
-                        """,
-                        mimeType: 'text/html',
-                        attachLog: true
-                    )
-                }
-            }
         }
         stage('Generate Coverage Report') {
             steps {
@@ -42,21 +30,14 @@ pipeline {
             steps {
                 bat 'npm audit || exit /b 0'
             }
-            post {
-                always {
-                    emailext(
-                        to: 'ronitkhokharr@gmail.com',
-                        subject: "Security Scan Stage - ${currentBuild.currentResult}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                        body: """
-                            <p>Build Status: <b>${currentBuild.currentResult}</b></p>
-                            <p>Job: ${env.JOB_NAME}</p>
-                            <p>Build Number: ${env.BUILD_NUMBER}</p>
-                            <p>Check console output at: <a href='${env.BUILD_URL}'>${env.BUILD_URL}</a></p>
-                        """,
-                        mimeType: 'text/html',
-                        attachLog: true
-                    )
-                }
+        }
+        stage('SonarCloud Analysis') {
+            steps {
+                bat '''
+                    curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-windows.zip
+                    tar -xf sonar-scanner.zip
+                    sonar-scanner-5.0.1.3006-windows\\bin\\sonar-scanner.bat -Dsonar.projectKey=ronitkhokharr_8.2CDevSecOps -Dsonar.organization=ronitkhokharr -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=%SONAR_TOKEN%
+                '''
             }
         }
     }
